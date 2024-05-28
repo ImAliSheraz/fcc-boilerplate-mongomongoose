@@ -134,14 +134,44 @@ const removeById = (personId, done) => {
 const removeManyPeople = (done) => {
   const nameToRemove = "Mary";
 
-  done(null /*, data*/);
+  Person.deleteMany({ name: nameToRemove }, (err, result) => {
+    if (err) {
+      return done(err);
+    }
+    return done(null, result);
+  });
 };
 
 const queryChain = (done) => {
   const foodToSearch = "burrito";
 
-  done(null /*, data*/);
+  Person.find({ favoriteFoods: foodToSearch }) // Find people who like the specified food
+    .sort({ name: 1 }) // Sort by name in ascending order
+    .limit(2) // Limit the results to 2 documents
+    .select('-age') // Exclude the age field
+    .exec((err, data) => {
+      if (err) {
+        return done(err);
+      }
+      return done(null, data);
+    });
 };
+
+removeManyPeople((err, result) => {
+  if (err) {
+    console.error('Error removing people:', err);
+  } else {
+    console.log('People removed successfully:', result);
+  }
+});
+
+queryChain((err, data) => {
+  if (err) {
+    console.error('Error querying people:', err);
+  } else {
+    console.log('Query results:', data);
+  }
+});
 
 /** **Well Done !!**
 /* You completed these challenges, let's go celebrate !
